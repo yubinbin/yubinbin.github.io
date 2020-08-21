@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>计算器</title>
+        <style>
+            body{
+                margin:16px;
+                background-color:#FFFFFF;
+            }
+
+            label{
+                color:#cccccc;
+                font-size: 20px;
+            }
+            #lowNum,#heightNum{
+                padding: 5px;
+                font-size: 20px;
+                border-radius: 3px;
+                border-width: 1px;
+                border-color: #eeeeee;
+                border-style: solid;
+            }    
+            .input-layout{
+                margin-top: 10px;
+            }
+            button{
+                width: 200px;
+                font-size: 25px;
+                color:#888888;
+            }
+
+        </style>
+    </head>
+        <div class="input-layout">
+            <label for="qushi">方向向上</label>
+            <input id="qushi" type="checkbox" checked="true" value="向上">
+        </div>
+
+        <div class="input-layout"> 
+            <label for="lowNum">最小值</label>
+            <input type="number" value="" id="lowNum"/>
+        </div>
+        <div class="input-layout">
+            <label for="heightNum">最大值</label>
+            <input type="number" value="" id="heightNum"/>
+        </div>
+
+        <button onclick="getResult()" style="margin-top: 20px;">计算</button>
+
+        <p id="result"> </p>
+
+        <div id="main" style="width: 600px;height:400px;margin-top: 20px;"></div>
+
+    </body>
+
+    <script src="./echarts.js"></script>
+
+    <script>
+        var inputLowDom,inputHeightDom,resultDom,qushiDom;
+        var stockData;
+
+        function init(){
+            inputLowDom = document.getElementById("lowNum");
+            inputHeightDom = document.getElementById("heightNum");
+            resultDom = document.getElementById("result");
+            qushiDom = document.getElementById("qushi");
+        }
+
+        init();
+
+
+        function getResult(){
+
+            if(!inputLowDom.value){
+                alert("请输入最小值！")
+                return;
+            }
+            if(!inputHeightDom.value){
+                alert("请输入最大值！")     
+                return;
+            }
+
+            let lowValue =   Number.parseFloat(inputLowDom.value);   
+            let heightValue =  Number.parseFloat(inputHeightDom.value);   
+
+            let length = heightValue-lowValue;
+            let qushi = qushiDom.checked;
+            if(qushi){// 趋势向上
+                stockData = [lowValue, heightValue, (heightValue-length*0.382).toFixed(2), 
+                (heightValue-length*0.5).toFixed(2), (heightValue-length*0.618).toFixed(2),
+                Math.sqrt(lowValue*heightValue).toFixed(2)];
+
+                resultDom.innerText = 
+                "回调382 = "+ (heightValue-length*0.382).toFixed(2)
+                +"  \n回调0.5 = "+ (heightValue-length*0.5).toFixed(2)
+                +"  \n回调618 = "+ (heightValue-length*0.618).toFixed(2)
+                +"  \n回调根号下H*V = "+ Math.sqrt(lowValue*heightValue).toFixed(2);
+
+            }else{// 趋势向下
+                stockData = [heightValue,lowValue,(lowValue+length*0.382).toFixed(2), 
+                (lowValue+length*0.5).toFixed(2), (lowValue+length*0.618).toFixed(2),
+                Math.sqrt(lowValue*heightValue).toFixed(2)];
+
+                resultDom.innerText = 
+                "向上反弹382 = "+ (lowValue+length*0.382).toFixed(2)
+                +"  \n向上反弹2 = "+ (lowValue+length*0.5).toFixed(2)
+                +"  \n向上反弹3 = "+ (lowValue+length*0.618).toFixed(2)
+                +"  \n向上反弹4 = "+ Math.sqrt(lowValue*heightValue).toFixed(2);
+            }
+
+            createChart(stockData);
+        }
+
+
+        var myChart;
+        function createChart(stockData){
+            // 基于准备好的dom，初始化echarts实例
+            if(!myChart){
+                myChart = echarts.init(document.getElementById('main'));
+            }
+
+            // 指定图表的配置项和数据
+            var option = {
+                title: {
+                    text: '回调反弹'
+                },
+                tooltip: {},
+                legend: {
+                    data:['点']
+                },
+                xAxis: {
+                    data: ["","","0.382","0.5","0.618","根号下H*V"]
+                },
+                yAxis: {},
+                series: [{
+                    name: '',
+                    type: 'line',
+                    data: stockData
+                }]
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+        }
+    </script>
+
+</html>
