@@ -1,7 +1,5 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-## 组件开发手册
-
 
 [^-^]:
     注释的写法
@@ -19,7 +17,17 @@
 
 <font size=4>
 
-#### readme
+笔记
+
+### markdown格式文档笔记
+> 文档来源
+> 1. 网上看到好的文档
+> 2. 自己编写总结
+
+### 类型
+> 1. 股票
+> 2. 编程
+> 3. 其他
 
 
 
