@@ -1,0 +1,1 @@
+import{_ as t,c as e,o}from"./chunks/framework.CqbvlPrP.js";const m=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"meditation/巴利文大藏经/1 copy.md","filePath":"meditation/巴利文大藏经/1 copy.md"}'),a={name:"meditation/巴利文大藏经/1 copy.md"};function c(n,r,i,s,p,d){return o(),e("div")}const f=t(a,[["render",c]]);export{m as __pageData,f as default};
