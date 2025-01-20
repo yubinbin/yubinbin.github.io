@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>复利测试</title>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+        }
+        .title-layout{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            position:sticky;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #fff;
+            border-bottom: 1px solid #ccc;
+            font-size: 16px;
+            color: #333;
+            padding: 0 18px;
+            font-weight: bold;
+        }
+        .btn-layout{
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            padding: 0 18px;
+        }
+        .btn-run{
+            width: 100px;
+            text-align: center;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #formElement{
+            width: 100%;
+            padding: 10px 18px;
+        }
+        .btn-run:hover{
+            background-color: #256127;
+        }
+        .form-item{
+            margin-bottom: 20px;
+        } 
+        .form-item label {
+            display: inline-block;
+            width: 200px;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-left: 18px;
+        }
+        .form-item input{
+            height: 30px;
+        }
+        table{
+            border: 1px solid #ccc;
+            width: 100%;
+            vertical-align: middle;
+            text-align: center;
+            margin-top: 10px;
+            padding: 0 18px;
+        }
+        tr {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+<div class="title-layout">
+    <span>复利测试</span>
+</div>
+<form id="formElement" action="#" >
+    <div class="form-item">
+        <label  for="startMoney">起始金额</label >
+        <input type="number" id="startMoney" name="startMoney" value="50000"/>
+    </div>
+    <div class="form-item">
+        <label  for="endMoney">目标金额</label >
+        <input type="number" id="endMoney" name="endMoney" value="1000000"/>
+    </div>
+    <div class="form-item">
+        <label  for="yinglilv">盈利百分比</label >
+        <input type="string" id="yinglilv" name="yinglilv" value="0.1"/>
+    </div>
+    <!-- <input type="submit" value="运行"/> -->
+</form>
+<div class="btn-layout">
+    <div class="btn-run" onclick="run()">运行</div>
+</div>
+<table>
+    <thead>
+        <tr>
+            <th>每笔盈利率</th>
+            <th>初始资金</th>
+            <th>目标资金</th>
+            <th>本次交易资金</th>
+            <th>当前资金</th>
+            <th>盈利金额</th>
+            <th>交易次数</th>   
+        </tr>
+    </thead>
+    <tbody id="resultInfo"></tbody>
+</table>
+
+<script>
+    function getFormData(formElements) {
+        const formData = {};
+        for (let i = 0; i < formElements.length; i++) {
+            const element = formElements[i];
+            if (element.name && element.nodeName !== 'FIELDSET') {
+            switch (element.type) {
+                case 'radio':
+                case 'checkbox':
+                if (element.checked) {
+                    formData[element.name] = element.value;
+                }
+                break;
+                case 'file':
+                formData[element.name] = element.files[0];
+                break;
+                default:
+                formData[element.name] = element.value;
+            }
+            }
+        }
+        return formData;
+    }
+    /**
+    * 止损大小对交易的影响
+    */
+    function run(){
+        let tbody = document.getElementById("resultInfo");
+        tbody.innerHTML = "";
+        
+        let formElement = document.getElementById("formElement");
+        const formData = getFormData(formElement);
+        // const formData = new FormData(formElement);
+        // 起始金额
+        let startMoney = Number(formData.startMoney);
+        // 最后剩余金额
+        let endMoney = Number(formData.endMoney);
+        // 当前金额
+        let currentMoney = startMoney;
+        // 盈利百分比
+        let yinglilv = parseFloat(formData.yinglilv);
+        // 交易次数
+        let count = 0;
+
+        console.log("formData====>",formData);
+
+        /**
+        * 复利计算
+        */
+        while(currentMoney <= endMoney){
+            count++;
+            let lastMoney = currentMoney;
+            currentMoney = Math.floor(currentMoney * (1 + yinglilv));
+            //console.log(`每笔盈利率：${yinglilv*100}%  起始资金： ${startMoney}  目标资金：${endMoney} 本次交易资金：${lastMoney}  当前金额：${currentMoney} 盈利金额：${currentMoney - lastMoney} 交易次数：${count}`)
+            let tr = tbody.insertRow();
+            let td1 = tr.insertCell();
+            let td2 = tr.insertCell();
+            let td3 = tr.insertCell();
+            let td4 = tr.insertCell();
+            let td5 = tr.insertCell();
+            let td6 = tr.insertCell();
+            let td7 = tr.insertCell();
+
+            /*   <th>每笔盈利率</th>
+            <th>初始资金</th>
+            <th>目标资金</th>
+            <th>本次交易资金</th>
+            <th>当前资金</th>
+            <th>盈利金额</th>
+            <th>交易次数</th>    */
+
+            td1.innerHTML = `${yinglilv*100}%`;
+            td2.innerHTML = `${startMoney}`;
+            td3.innerHTML = `${endMoney}`;
+            td4.innerHTML = `${lastMoney}`;
+            td5.innerHTML = `${currentMoney}`;
+            td6.innerHTML = `${currentMoney - lastMoney}`;
+            td6.style.color = "red";
+            td7.innerHTML = `${count}`;
+        }
+    }
+
+    window.onload = function(){
+        run();
+    }
+</script>
+</body>
+</html>
