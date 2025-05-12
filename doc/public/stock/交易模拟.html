@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交易模拟</title>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+        }
+        .title-layout{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            position:sticky;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #fff;
+            border-bottom: 1px solid #ccc;
+            font-size: 16px;
+            color: #333;
+            padding: 0 18px;
+            font-weight: bold;
+        }
+        .btn-layout{
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            padding: 0 18px;
+        }
+        .btn-run{
+            width: 100px;
+            text-align: center;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #formElement{
+            width: 100%;
+            padding: 10px 18px;
+        }
+        .btn-run:hover{
+            background-color: #256127;
+        }
+        .form-item{
+            margin-bottom: 20px;
+        } 
+        .form-item label {
+            display: inline-block;
+            width: 200px;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-left: 18px;
+        }
+        .form-item input{
+            height: 30px;
+        }
+        .last-info-layout{
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 10px 18px;
+            margin-top: 18px;
+        }
+        .last-info-layout-item{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-bottom: 18px;
+            margin-right: 18px;
+        }
+        .last-info-layout-item-content{
+            margin-left: 10px;
+            font: 14px;
+            color: #333;
+            font-weight: bold;
+        }
+        table{
+            border: 1px solid #ccc;
+            width: 100%;
+            vertical-align: middle;
+            text-align: center;
+            margin-top: 10px;
+            padding: 0 18px;
+        }
+        tr {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+<div class="title-layout">
+    <span>交易模拟</span>
+</div>
+<!-- // 开始金额
+let startMoney = Number(formData.startMoney);
+// 盈亏比
+let yingkunbi = Number(formData.yingkunbi);
+// 胜率
+let shenglv = Number(formData.shenglv);
+// 止损总资金百分比
+let zhisunlv = parseFloat(formData.zhisunlv);
+// 交易总次数
+let totalCount = Number(formData.totalCount); -->
+<form id="formElement" action="#" >
+    <div class="form-item">
+        <label  for="startMoney">起始金额</label >
+        <input type="number" id="startMoney" name="startMoney" value="50000"/>
+    </div>
+    <div class="form-item">
+        <label  for="yingkunbi">盈亏比</label >
+        <input type="string" id="yingkunbi" name="yingkunbi" value="3"/>
+    </div>
+    <div class="form-item">
+        <label  for="shenglv">胜率</label >
+        <input type="string" id="shenglv" name="shenglv" value="0.5"/>
+    </div>
+    <div class="form-item">
+        <label  for="zhisunlv">止损总资金百分比</label >
+        <input type="string" id="zhisunlv" name="zhisunlv" value="0.02"/>
+    </div>
+    <div class="form-item">
+        <label  for="totalCount">交易次数</label >
+        <input type="string" id="totalCount" name="totalCount" value="20"/>
+    </div>
+    <!-- <input type="submit" value="运行"/> -->
+</form>
+<div class="btn-layout">
+    <div class="btn-run" onclick="run()">运行</div>
+</div>
+<table>
+    <thead>
+        <tr>
+            <th>止损总资金百分比</th>
+            <th>每笔盈利率</th>
+            <th>初始资金</th>
+            <th>本次交易资金</th>
+            <th>当前金额</th>
+            <th>盈利金额</th>
+            <th>交易次数</th>   
+        </tr>
+    </thead>
+    <div id="lastInfo"></div>
+    <tbody id="resultInfo"></tbody>
+</table>
+
+<script>
+    function getFormData(formElements) {
+        const formData = {};
+        for (let i = 0; i < formElements.length; i++) {
+            const element = formElements[i];
+            if (element.name && element.nodeName !== 'FIELDSET') {
+            switch (element.type) {
+                case 'radio':
+                case 'checkbox':
+                if (element.checked) {
+                    formData[element.name] = element.value;
+                }
+                break;
+                case 'file':
+                formData[element.name] = element.files[0];
+                break;
+                default:
+                formData[element.name] = element.value;
+            }
+            }
+        }
+        return formData;
+    }
+
+
+    /**
+        赢
+        count 交易次数，赢几次
+        info {yinglilv: 0.1,startMoney: 50000}
+    */ 
+    function win(info){
+        // 盈利百分比
+        let yinglilv = info.yinglilv;
+        // 开始金额
+        let startMoney = info.startMoney;
+        // 当前金额
+        let currentMoney = startMoney;
+        // 交易次数
+        let count = info.winCount;
+        
+        while(count > 0){
+            info.count++;
+            count--;
+            let lastMoney = currentMoney;
+            currentMoney = Math.floor(currentMoney * (1 + yinglilv));
+            //console.log(`每笔盈利率：${yinglilv*100}%  起始资金： ${startMoney}   本次交易资金：${lastMoney}  当前金额：${currentMoney} 盈利金额：${currentMoney - lastMoney} 交易次数：${count}`)
+        
+            /*   <th>止损总资金百分比</th>
+            <th>每笔盈利率</th>
+            <th>初始资金</th>
+            <th>本次交易资金</th>
+            <th>当前金额</th>
+            <th>盈利金额</th>
+            <th>交易次数</th>  */  
+            let tbody = document.getElementById("resultInfo");
+            let tr = tbody.insertRow();
+            let td1 = tr.insertCell();
+            let td2 = tr.insertCell();
+            let td3 = tr.insertCell();
+            let td4 = tr.insertCell();
+            let td5 = tr.insertCell();
+            let td6 = tr.insertCell();
+            let td7 = tr.insertCell();
+            td1.innerHTML = `${info.zhisunlv*100}%`;
+            td2.innerHTML = `${yinglilv*100}%`;
+            td3.innerHTML = `${startMoney}`;
+            td4.innerHTML = `${lastMoney}`;
+            td5.innerHTML = `${currentMoney}`;
+            td6.innerHTML = `${currentMoney - lastMoney}`;
+            td6.style.color = "red";
+            td7.innerHTML = `${info.count}`;
+        }
+
+        info.startMoney = currentMoney;
+    }
+
+    /**
+        输
+        count 交易次数，输几次
+        info {zhisunlv: 0.1,startMoney: 50000}
+    */ 
+    function lose(info){
+        // 起始金额
+        let startMoney = info.startMoney;
+        // 当前金额
+        let currentMoney = startMoney;
+        // 亏损占总资金的百分比
+        let zhisunlv = info.zhisunlv;
+        // 交易次数
+        let count = info.loseCount;
+        
+        while( count > 0 ){
+            info.count++;
+            count--;
+            let lastMoney = currentMoney;
+            currentMoney = Math.floor(currentMoney * (1 - zhisunlv));
+            //console.log(`止损总资金百分比：${zhisunlv*100}% 初始资金： ${startMoney} 剩余资金：${currentMoney} 亏损额：${lastMoney - currentMoney} 交易次数：${count}`);
+            
+            /*   <th>止损总资金百分比</th>
+            <th>每笔盈利率</th>
+            <th>初始资金</th>
+            <th>本次交易资金</th>
+            <th>当前金额</th>
+            <th>盈利金额</th>
+            <th>交易次数</th>  */  
+            let tbody = document.getElementById("resultInfo");
+            let tr = tbody.insertRow();
+            let td1 = tr.insertCell();
+            let td2 = tr.insertCell();
+            let td3 = tr.insertCell();
+            let td4 = tr.insertCell();
+            let td5 = tr.insertCell();
+            let td6 = tr.insertCell();
+            let td7 = tr.insertCell();
+            td1.innerHTML = `${zhisunlv*100}%`;
+            td2.innerHTML = `${info.yinglilv*100}%`;
+            td3.innerHTML = `${startMoney}`;
+            td4.innerHTML = `${lastMoney}`;
+            td5.innerHTML = `${currentMoney}`;
+            td6.innerHTML = `${currentMoney - lastMoney}`;
+            td6.style.color = "green";
+            td7.innerHTML = `${info.count}`;
+        }
+        info.startMoney = currentMoney;
+    }
+
+
+    /**
+    * 止损大小对交易的影响
+    */
+    function run(){
+        let tbody = document.getElementById("resultInfo");
+        tbody.innerHTML = "";
+        
+        let formElement = document.getElementById("formElement");
+        const formData = getFormData(formElement);
+        // const formData = new FormData(formElement);
+    
+        console.log("formData====>",formData);
+        
+        // 开始金额
+        let startMoney = Number(formData.startMoney);
+        // 盈亏比
+        let yingkunbi = Number(formData.yingkunbi);
+        // 胜率
+        let shenglv = Number(formData.shenglv);
+        // 止损总资金百分比
+        let zhisunlv = parseFloat(formData.zhisunlv);
+        // 盈利百分比
+        let yinglilv = yingkunbi * zhisunlv;
+        // 交易总次数
+        let totalCount = Number(formData.totalCount);
+        // 赢几次
+        let winCount = totalCount * shenglv;
+        // 输几次即止损几次
+        let loseCount = totalCount - winCount;
+
+        let info = {
+            startMoney: startMoney,
+            zhisunlv: zhisunlv,
+            yinglilv: yinglilv,
+            winCount: winCount,
+            loseCount: loseCount,
+            count: 0
+        }
+
+        win(info);
+        lose(info);
+
+   /*  console.log(`止损：${zhisunlv*100}% 盈利百分比：${yinglilv*100}% 盈亏比： ${yingkunbi} 
+    总交易次数：${totalCount} 盈利次数： ${winCount} 失败次数： ${loseCount} 胜率：${shenglv}
+    开始资金；${startMoney} 当前资金：${info.startMoney}
+盈利金额： ${info.startMoney - startMoney} 盈利百分比： ${((info.startMoney - startMoney)/startMoney*100).toFixed(2)}% `) */
+        /* document.getElementById("lastInfo").innerHTML = ` 盈利次数： ${winCount} 失败次数： ${loseCount} 胜率：${shenglv}
+    开始资金；${startMoney} 当前资金：${info.startMoney}
+盈利金额： ${info.startMoney - startMoney} 盈利百分比： ${((info.startMoney - startMoney)/startMoney*100).toFixed(2)}% `
+     */
+        document.getElementById("lastInfo").innerHTML = `
+        <div class="last-info-layout">
+            <div class="last-info-layout-item">
+                <div class="last-info-layout-item-content">盈利次数： ${winCount} </div> 
+                <div class="last-info-layout-item-content">失败次数： ${loseCount}</div>
+                <div class="last-info-layout-item-content">胜率：${shenglv}</div>    
+            </div>
+            <div class="last-info-layout-item">
+                <div class="last-info-layout-item-content">开始资金；${startMoney}</div>
+                <div class="last-info-layout-item-content">当前资金：${info.startMoney}</div>
+                <div class="last-info-layout-item-content">盈利金额： ${info.startMoney - startMoney}</div>
+                <div class="last-info-layout-item-content">盈利百分比： ${((info.startMoney - startMoney)/startMoney*100).toFixed(2)}%</div>    
+            </div>
+        </div>
+        `
+    }
+
+    window.onload = function(){
+        run();
+    }
+</script>
+</body>
+</html>
