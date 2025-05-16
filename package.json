@@ -2,7 +2,7 @@
   "name": "note",
   "version": "1.0.0",
   "description": "笔记",
-  "main": "index.js",
+  "main": "index.html",
   "directories": {
     "doc": "docs"
   },
